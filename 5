@@ -1,0 +1,89 @@
+Objective: Setting up CI/CD pipelines using GitHub Actions or Jenkins, Automated testing 
+and deployment, Integrating with Docker.
+Required Software / Tools: Docker Desktop, Python, VSCode, GITHUB.
+Procedure:
+Step1: Login to VSCode, open new folder name Exp5 and create app.py file with 
+basic python program as below.
+def is_palindrome(word: str) -> bool:
+ cleaned = word.lower().replace(" ", "")
+ return cleaned == cleaned[::-1]
+if __name__ == "__main__":
+ user_input = input("Enter a word: ")
+ if is_palindrome(user_input):
+ print(f" '{user_input}' is a palindrome!")
+ else:
+ print(f" '{user_input}' is not a palindrome.")
+Step2: Test the python code locally 
+python app.py
+Step3: create a test code with name test_app.py
+import app
+def test_palindrome_true():
+ assert app.is_palindrome("madam") is True
+ assert app.is_palindrome("racecar") is True
+def test_palindrome_false():
+ assert app.is_palindrome("hello") is False
+ assert app.is_palindrome("python") is False
+step4: Test pytest locally
+pip install pytest
+python -m pytest
+step5: Create requirements.txt with below contents 
+pytest
+Step6: Create Docker file with below contents name it Dockerfile
+FROM python:3.10-slim
+WORKDIR /app
+COPY requirements.txt .
+RUN pip install -r requirements.txt
+COPY . .
+CMD ["python", "app.py"]
+Stpe7: Build and Test the Docker Container
+docker build -t palindrome-app .
+docker run -it palindrome-app
+Step 8: Create CI/CD pipeline using GITHUB Actions with name ci.yml under 
+i.
+From terminal run below command 
+mkdir -p .github/workflows
+ii.
+Navigate to workflow directory and create ci.yml with below contents
+name: CI/CD Pipeline
+on:
+ push:
+ branches: [ "main" ]
+ pull_request:
+ branches: [ "main" ]
+jobs:
+ build-test:
+ runs-on: ubuntu-latest
+ steps:
+ - name: Checkout code
+ uses: actions/checkout@v3
+ - name: Set up Python
+ uses: actions/setup-python@v4
+ with:
+ python-version: "3.10
+ name: Install dependencies
+ run: |
+ pip install -r requirements.txt
+ - name: Run tests
+ run: python -m pytest
+ docker-build:
+ runs-on: ubuntu-latest
+ needs: build-test
+ steps:
+ - name: Checkout code
+ uses: actions/checkout@v3
+ - name: Build Docker image
+ run: docker build -t palindrome-app .
+Step9: Create Github repo with name Exp5
+Step10: Push the code to Github and verify Github Actions
+echo "# Exp5" >> README.md
+git init
+git add README.md
+git commit -m "first commit"
+git branch -M main
+git remote add origin https://github.com/bandarichandra510/Exp5.git
+git push -u origin main
+Note: Check if you are able to view readme file in Github UI.
+git add .
+git commit -m "Initial commit - palindrome app with CI/CD"
+git branch -M main
+git push -u origin main
